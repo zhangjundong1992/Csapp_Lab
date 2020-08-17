@@ -474,18 +474,18 @@ Disassembly of section .text:
   401071:	00 00 
   401073:	48 89 44 24 18       	mov    %rax,0x18(%rsp)
   401078:	31 c0                	xor    %eax,%eax
-  40107a:	e8 9c 02 00 00       	callq  40131b <string_length>
-  40107f:	83 f8 06             	cmp    $0x6,%eax
-  401082:	74 4e                	je     4010d2 <phase_5+0x70>
+  40107a:	e8 9c 02 00 00       	callq  40131b <string_length>   
+  40107f:	83 f8 06             	cmp    $0x6,%eax    # 输入字符串长度必须为6
+  401082:	74 4e                	je     4010d2 <phase_5+0x70>    
   401084:	e8 b1 03 00 00       	callq  40143a <explode_bomb>
   401089:	eb 47                	jmp    4010d2 <phase_5+0x70>
   40108b:	0f b6 0c 03          	movzbl (%rbx,%rax,1),%ecx
   40108f:	88 0c 24             	mov    %cl,(%rsp)
   401092:	48 8b 14 24          	mov    (%rsp),%rdx
-  401096:	83 e2 0f             	and    $0xf,%edx
+  401096:	83 e2 0f             	and    $0xf,%edx    # 取低4位
   401099:	0f b6 92 b0 24 40 00 	movzbl 0x4024b0(%rdx),%edx
   4010a0:	88 54 04 10          	mov    %dl,0x10(%rsp,%rax,1)
-  4010a4:	48 83 c0 01          	add    $0x1,%rax
+  4010a4:	48 83 c0 01          	add    $0x1,%rax    # 计数器
   4010a8:	48 83 f8 06          	cmp    $0x6,%rax
   4010ac:	75 dd                	jne    40108b <phase_5+0x29>
   4010ae:	c6 44 24 16 00       	movb   $0x0,0x16(%rsp)
@@ -515,19 +515,21 @@ Disassembly of section .text:
   4010fa:	55                   	push   %rbp
   4010fb:	53                   	push   %rbx
   4010fc:	48 83 ec 50          	sub    $0x50,%rsp
+
+  # 读取6个数字，每个数字小于等于6，且6个数字互异
   401100:	49 89 e5             	mov    %rsp,%r13
   401103:	48 89 e6             	mov    %rsp,%rsi
   401106:	e8 51 03 00 00       	callq  40145c <read_six_numbers>
   40110b:	49 89 e6             	mov    %rsp,%r14
   40110e:	41 bc 00 00 00 00    	mov    $0x0,%r12d
-  401114:	4c 89 ed             	mov    %r13,%rbp
+  401114:	4c 89 ed             	mov    %r13,%rbp 
   401117:	41 8b 45 00          	mov    0x0(%r13),%eax
   40111b:	83 e8 01             	sub    $0x1,%eax
   40111e:	83 f8 05             	cmp    $0x5,%eax
   401121:	76 05                	jbe    401128 <phase_6+0x34>
   401123:	e8 12 03 00 00       	callq  40143a <explode_bomb>
   401128:	41 83 c4 01          	add    $0x1,%r12d
-  40112c:	41 83 fc 06          	cmp    $0x6,%r12d
+  40112c:	41 83 fc 06          	cmp    $0x6,%r12d   # 外循环计数器
   401130:	74 21                	je     401153 <phase_6+0x5f>
   401132:	44 89 e3             	mov    %r12d,%ebx
   401135:	48 63 c3             	movslq %ebx,%rax
@@ -536,10 +538,12 @@ Disassembly of section .text:
   40113e:	75 05                	jne    401145 <phase_6+0x51>
   401140:	e8 f5 02 00 00       	callq  40143a <explode_bomb>
   401145:	83 c3 01             	add    $0x1,%ebx
-  401148:	83 fb 05             	cmp    $0x5,%ebx
+  401148:	83 fb 05             	cmp    $0x5,%ebx    # 内循环计数器
   40114b:	7e e8                	jle    401135 <phase_6+0x41>
   40114d:	49 83 c5 04          	add    $0x4,%r13
   401151:	eb c1                	jmp    401114 <phase_6+0x20>
+
+  # 7减去每个值保存到原位置
   401153:	48 8d 74 24 18       	lea    0x18(%rsp),%rsi
   401158:	4c 89 f0             	mov    %r14,%rax
   40115b:	b9 07 00 00 00       	mov    $0x7,%ecx
@@ -547,14 +551,18 @@ Disassembly of section .text:
   401162:	2b 10                	sub    (%rax),%edx
   401164:	89 10                	mov    %edx,(%rax)
   401166:	48 83 c0 04          	add    $0x4,%rax
-  40116a:	48 39 f0             	cmp    %rsi,%rax
+  40116a:	48 39 f0             	cmp    %rsi,%rax    # rax计数器
   40116d:	75 f1                	jne    401160 <phase_6+0x6c>
+
+  # 根据栈中6个数字的顺序（ddc0），在内存中读取数值存储到栈中（dde0）
   40116f:	be 00 00 00 00       	mov    $0x0,%esi
   401174:	eb 21                	jmp    401197 <phase_6+0xa3>
+
   401176:	48 8b 52 08          	mov    0x8(%rdx),%rdx
-  40117a:	83 c0 01             	add    $0x1,%eax
-  40117d:	39 c8                	cmp    %ecx,%eax
+  40117a:	83 c0 01             	add    $0x1,%eax    
+  40117d:	39 c8                	cmp    %ecx,%eax    # eax计数器
   40117f:	75 f5                	jne    401176 <phase_6+0x82>
+
   401181:	eb 05                	jmp    401188 <phase_6+0x94>
   401183:	ba d0 32 60 00       	mov    $0x6032d0,%edx
   401188:	48 89 54 74 20       	mov    %rdx,0x20(%rsp,%rsi,2)
@@ -567,18 +575,22 @@ Disassembly of section .text:
   40119f:	b8 01 00 00 00       	mov    $0x1,%eax
   4011a4:	ba d0 32 60 00       	mov    $0x6032d0,%edx
   4011a9:	eb cb                	jmp    401176 <phase_6+0x82>
+
+  # 检查链表是否有序
   4011ab:	48 8b 5c 24 20       	mov    0x20(%rsp),%rbx
   4011b0:	48 8d 44 24 28       	lea    0x28(%rsp),%rax
   4011b5:	48 8d 74 24 50       	lea    0x50(%rsp),%rsi
   4011ba:	48 89 d9             	mov    %rbx,%rcx
+    # 修改链表指针
   4011bd:	48 8b 10             	mov    (%rax),%rdx
   4011c0:	48 89 51 08          	mov    %rdx,0x8(%rcx)
   4011c4:	48 83 c0 08          	add    $0x8,%rax
-  4011c8:	48 39 f0             	cmp    %rsi,%rax
+  4011c8:	48 39 f0             	cmp    %rsi,%rax    # rax计数器
   4011cb:	74 05                	je     4011d2 <phase_6+0xde>
   4011cd:	48 89 d1             	mov    %rdx,%rcx
   4011d0:	eb eb                	jmp    4011bd <phase_6+0xc9>
   4011d2:	48 c7 42 08 00 00 00 	movq   $0x0,0x8(%rdx)
+    # 链表必须从大到小排列
   4011d9:	00 
   4011da:	bd 05 00 00 00       	mov    $0x5,%ebp
   4011df:	48 8b 43 08          	mov    0x8(%rbx),%rax
