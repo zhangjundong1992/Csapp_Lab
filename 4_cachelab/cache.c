@@ -31,20 +31,19 @@ void setCacheInfo(int S, int E, int B)
     cacheInfo.E = E;
     cacheInfo.B = B;
 
-    printf("cacheInfo(S,E,B) is (%d,%d,%d)\n", S, E, B);
+    // printf("cacheInfo(S,E,B) is (%d,%d,%d)\n", S, E, B);
 }
 
 CachePtr cache;
 
 void initCache(int s, int E, int b)
 {
-    printf("arg(s,E,b) is (%d,%d,%d)\n", s, E, b);
-    /* 初始化缓存元组 */
+    /* 初始化缓存元组,地址空间元组 */
     setAddrInfo(bitWidth - s - b, s, b);
     setCacheInfo((int)pow(2.0, s), E, (int)pow(2.0, b));
-    int num = cacheInfo.S * cacheInfo.E;
 
     /* 分配内存并初始化 */
+    int num = cacheInfo.S * cacheInfo.E;
     cache = (CachePtr)malloc(num * sizeof(CacheLine));
 
     for (int i = 0; i < num; i++)
@@ -60,8 +59,6 @@ void visit(unsigned long address, BehavrInfo *info)
     /* 切分地址的r,s,b位 */
     int r = address >> (addrInfo.s + addrInfo.b);
     int s = address << addrInfo.r >> (addrInfo.r + addrInfo.b);
-
-    // printf("addr is %lx,s is %d,r is %d\n", address, s, r);
 
     /* 更新时间戳 */
     for (int i = 0; i < cacheInfo.S * cacheInfo.E; i++)
@@ -81,7 +78,6 @@ void visit(unsigned long address, BehavrInfo *info)
         {
             cache[i].stamp = 0;
             (*info).hits++;
-            puts("hit");
             return;
         }
     }
@@ -95,7 +91,6 @@ void visit(unsigned long address, BehavrInfo *info)
             cache[i].tag = r;
             cache[i].stamp = 0;
             (*info).misses++;
-            puts("miss");
             return;
         }
     }
@@ -115,7 +110,6 @@ void visit(unsigned long address, BehavrInfo *info)
     cache[index].stamp = 0;
     (*info).misses++;
     (*info).evictions++;
-    puts("miss and eviction");
 }
 
 void freeCacke()

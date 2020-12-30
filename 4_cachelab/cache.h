@@ -25,14 +25,6 @@ typedef struct CacheLine
 
 void initCache(int s, int E, int b);
 
-// typedef enum ResCode
-// {
-//     HIT,
-//     MISS,
-//     MISS_AND_EVICTION,
-//     ERROR
-// } ResCode;
-
 void visit(unsigned long address, BehavrInfo *info);
 
 void freeCacke();

@@ -47,19 +47,17 @@ int main(int argc, char *argv[])
         }
     }
 
-    
     initCache(s, E, b);
 
     // 2、读文件，模拟缓存读写
     BehavrInfo behavrInfo;
-    // int hitCount = 0, missCount = 0, evictCount = 0;
     char handle;
     unsigned long addr;
     int width;
 
     FILE *fp = fopen(path, "r");
 
-    while (fscanf(fp, " %c %lx,%d", &handle, &addr, &width) != EOF)
+    while (fscanf(fp, "%c %lx,%d", &handle, &addr, &width) != EOF)
     {
         // printf("handle is %c,addr is %lx\n", handle, addr);
         switch (handle)
@@ -99,6 +97,8 @@ void printUsage()
     if (fp == NULL)
     {
         printf("file does not exit!\n");
+        fclose(fp);
+        return;
     }
 
     while (fgets(buff, lineLength, fp) != NULL)
