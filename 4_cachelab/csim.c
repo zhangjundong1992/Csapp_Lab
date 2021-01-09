@@ -1,49 +1,46 @@
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <getopt.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
-#include "cachelab.h"
 #include "cache.h"
+#include "cachelab.h"
 #include "utilies.h"
 
 #define lineLength 100 /* 按行读取文件时，每行的字符缓存长度 */
 
 void printUsage();
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     // 1 、解析参数,分配内存模拟缓存
     int opt = 0;
     int s = 0, E = 0, b = 0;
     char path[lineLength];
 
-    while ((opt = getopt(argc, argv, "hvs:E:b:t:")) != -1)
-    {
-        switch (opt)
-        {
-        case 'h':
-            printUsage();
-            return 0;
-        case 'v':
-            /* 暂时不做处理 */
-            break;
-        case 's':
-            s = atoi(optarg);
-            break;
-        case 'E':
-            E = atoi(optarg);
-            break;
-        case 'b':
-            b = atoi(optarg);
-            break;
-        case 't':
-            strcpy(path, optarg);
-            break;
-        default:
-            printf("argc parse err");
-            return 0;
+    while ((opt = getopt(argc, argv, "hvs:E:b:t:")) != -1) {
+        switch (opt) {
+            case 'h':
+                printUsage();
+                return 0;
+            case 'v':
+                /* 暂时不做处理 */
+                break;
+            case 's':
+                s = atoi(optarg);
+                break;
+            case 'E':
+                E = atoi(optarg);
+                break;
+            case 'b':
+                b = atoi(optarg);
+                break;
+            case 't':
+                strcpy(path, optarg);
+                break;
+            default:
+                printf("argc parse err");
+                return 0;
         }
     }
 
@@ -57,26 +54,22 @@ int main(int argc, char *argv[])
 
     FILE *fp = fopen(path, "r");
 
-    while (fscanf(fp, "%c %lx,%d", &handle, &addr, &width) != EOF)
-    {
+    while (fscanf(fp, "%c %lx,%d", &handle, &addr, &width) != EOF) {
         // printf("handle is %c,addr is %lx\n", handle, addr);
-        switch (handle)
-        {
-
-        case 'L':
-        case 'S':
-            visit(addr, &behavrInfo);
-            break;
-        case 'M':
-            visit(addr, &behavrInfo);
-            visit(addr, &behavrInfo);
-            break;
-        case 'I':
-            /* I指令不做处理 */
-            break;
-        default:
-
-            break;
+        switch (handle) {
+            case 'L':
+            case 'S':
+                visit(addr, &behavrInfo);
+                break;
+            case 'M':
+                visit(addr, &behavrInfo);
+                visit(addr, &behavrInfo);
+                break;
+            case 'I':
+                /* I指令不做处理 */
+                break;
+            default:
+                break;
         }
     }
 
@@ -87,22 +80,19 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void printUsage()
-{ /* 打印帮助信息 */
+void printUsage() { /* 打印帮助信息 */
     FILE *fp = NULL;
     char buff[lineLength];
 
     fp = fopen("UsageTxt", "r");
 
-    if (fp == NULL)
-    {
+    if (fp == NULL) {
         printf("file does not exit!\n");
         fclose(fp);
         return;
     }
 
-    while (fgets(buff, lineLength, fp) != NULL)
-    {
+    while (fgets(buff, lineLength, fp) != NULL) {
         puts(buff);
     }
 

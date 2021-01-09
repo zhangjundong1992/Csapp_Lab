@@ -141,8 +141,7 @@ NOTES:
  *   Max ops: 14
  *   Rating: 1
  */
-int bitXor(int x, int y)
-{
+int bitXor(int x, int y) {
     // 否定和合取构成了完备集
     int var1 = x & y;
     int var2 = (~x) & (~y);
@@ -155,8 +154,7 @@ int bitXor(int x, int y)
  *   Max ops: 4
  *   Rating: 1
  */
-int tmin(void)
-{
+int tmin(void) {
     //直接移位得到
     return 1 << 31;
 }
@@ -168,8 +166,7 @@ int tmin(void)
  *   Max ops: 10
  *   Rating: 1
  */
-int isTmax(int x)
-{
+int isTmax(int x) {
     // x=Tmax和-1时，经过+1和取反操作后等于本身，此时var2==1;其他情况，var2==0
     int var1 = ~(x + 1);
     int var2 = !(var1 ^ x);
@@ -187,10 +184,9 @@ int isTmax(int x)
  *   Max ops: 12
  *   Rating: 2
  */
-int allOddBits(int x)
-{
-    int var1 = 0x55;                   //二进制01010101b
-    int var2 = (x | var1) << 24 >> 24; //奇数位全1的话得到结果0xffffffff
+int allOddBits(int x) {
+    int var1 = 0x55;                    //二进制01010101b
+    int var2 = (x | var1) << 24 >> 24;  //奇数位全1的话得到结果0xffffffff
     int var3 = ((x >> 8) | var1) << 24 >> 24;
     int var4 = ((x >> 16) | var1) << 24 >> 24;
     int var5 = ((x >> 24) | var1) << 24 >> 24;
@@ -204,8 +200,7 @@ int allOddBits(int x)
  *   Max ops: 5
  *   Rating: 2
  */
-int negate(int x)
-{
+int negate(int x) {
     //按位取反+1
     return ~x + 1;
 }
@@ -218,8 +213,7 @@ int negate(int x)
  *   Max ops: 15
  *   Rating: 3
  */
-int isAsciiDigit(int x)
-{
+int isAsciiDigit(int x) {
     // x-0x30、x-0x39之后取移位，如果为正则结果为0；为负则为0xffffffff
     int var1 = (x + (~0x30 + 1)) >> 31;
     int var2 = (x + (~0x3a + 1)) >> 31;
@@ -232,9 +226,8 @@ int isAsciiDigit(int x)
  *   Max ops: 16
  *   Rating: 3
  */
-int conditional(int x, int y, int z)
-{
-    int var1 = ~(!x << 31 >> 31); // x!=0时，var1==0xffffffff;x==0时，var1==0
+int conditional(int x, int y, int z) {
+    int var1 = ~(!x << 31 >> 31);  // x!=0时，var1==0xffffffff;x==0时，var1==0
     return (y & var1) + (z & ~var1);
 }
 /*
@@ -244,8 +237,7 @@ int conditional(int x, int y, int z)
  *   Max ops: 24
  *   Rating: 3
  */
-int isLessOrEqual(int x, int y)
-{
+int isLessOrEqual(int x, int y) {
     //符号判断，同号为1，异号为0
     int var1 = !((x >> 31) ^ (y >> 31));
 
@@ -266,8 +258,7 @@ int isLessOrEqual(int x, int y)
  *   Max ops: 12
  *   Rating: 4
  */
-int logicalNeg(int x)
-{
+int logicalNeg(int x) {
     //对x的所有位进行或操作，x==0则结果为0；x！=0则结果为1，保存到最低位。
     int var1 = x | (x >> 8) | (x >> 16) | (x >> 24);
     int var2 = var1 | (var1 >> 2) | (var1 >> 4) | (var1 >> 6);
@@ -287,11 +278,10 @@ int logicalNeg(int x)
  *  Max ops: 90
  *  Rating: 4
  */
-int howManyBits(int x)
-{
+int howManyBits(int x) {
     /* 核心思想为从高位开始找第一个与符号位不同的值 */
 
-    //x为正，则不改变x;x为负，则取反码。其结果将x符号位（包括扩展的）置0
+    // x为正，则不改变x;x为负，则取反码。其结果将x符号位（包括扩展的）置0
     x = x ^ (x >> 31);
 
     int b16 = !!(x >> 16) << 4;
@@ -325,26 +315,22 @@ int howManyBits(int x)
  *   Max ops: 30
  *   Rating: 4
  */
-unsigned floatScale2(unsigned uf)
-{
+unsigned floatScale2(unsigned uf) {
     //取阶码值
     unsigned int exp = (uf << 1 >> 24) & 0xff;
 
     //阶码全0的情况，直接按照无符号数运算规则计算2f,再加上符号位，等价于浮点数2f
-    if (exp == 0u)
-    {
+    if (exp == 0u) {
         return (uf << 1) + (uf >> 31 << 31);
     }
 
     //阶码全1的情况,直接返回参数本身.如果uf=无穷，返回无穷;如果uf=NaN，返回NaN
-    if (exp == 0xffu)
-    {
+    if (exp == 0xffu) {
         return uf;
     }
 
     //阶码为11111110b时,2f结果为无穷
-    if (exp >= 0xfeu)
-    {
+    if (exp >= 0xfeu) {
         return (0xff << 23) + (uf >> 31 << 31);
     }
 
@@ -363,38 +349,31 @@ unsigned floatScale2(unsigned uf)
  *   Max ops: 30
  *   Rating: 4
  */
-int floatFloat2Int(unsigned uf)
-{
+int floatFloat2Int(unsigned uf) {
     //取阶码值
     int exp = (uf << 1 >> 24) & 0xff;
 
     //浮点数值越界，返回最小值(exp=158，E=158-127=31)
     //-2^31不越界，但是刚好返回原本的补码值0x80000000u
-    if (exp - 127 >= 31)
-    {
+    if (exp - 127 >= 31) {
         return 0x80000000u;
     }
 
     //小于1的数值直接返回0
-    if (exp - 127 < 0)
-    {
+    if (exp - 127 < 0) {
         return 0;
     }
 
     //构造出尾数（视为已经左移23位之后的值）
     int M = ((uf & 0x7fffff) + 0x800000);
-    if (exp - 127 >= 23)
-    {
+    if (exp - 127 >= 23) {
         M = M << ((exp - 127) - 23);
-    }
-    else
-    {
+    } else {
         M = M >> (23 - (exp - 127));
     }
 
     //判断符号位,如果时负值，则取-M
-    if (uf >= 0x80000000u)
-    {
+    if (uf >= 0x80000000u) {
         M = ~M + 1;
     }
 
@@ -413,29 +392,24 @@ int floatFloat2Int(unsigned uf)
  *   Max ops: 30
  *   Rating: 4
  */
-unsigned floatPower2(int x)
-{
+unsigned floatPower2(int x) {
     //下溢,-126+-23=-149
-    if (x < -149)
-    {
+    if (x < -149) {
         return 0;
     }
 
     //非规格化表示
-    if (x >= -149 && x < -126)
-    {
+    if (x >= -149 && x < -126) {
         return 1 << (x + 149);
     }
 
     //规格化表示
-    if (x >= -126 && x <= 127)
-    {
+    if (x >= -126 && x <= 127) {
         return (x + 127) << 23;
     }
 
     //上溢
-    if (x > 127)
-    {
+    if (x > 127) {
         return 0xff << 23;
     }
 }
